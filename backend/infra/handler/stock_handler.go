@@ -28,8 +28,12 @@ func (handler *StockHandler) RegisterRoutes(routes chi.Router) {
 
 func (handler *StockHandler) GetStocks(response http.ResponseWriter, request *http.Request) {
 	query := request.URL.Query()
+
 	limitStr := query.Get("limit")
-	limit := 20 // default
+	limit := 10 // default
+
+	offsetStr := query.Get("offset")
+	offset := 0 // default
 
 	l, err := strconv.Atoi(limitStr)
 
@@ -37,7 +41,13 @@ func (handler *StockHandler) GetStocks(response http.ResponseWriter, request *ht
 		limit = l
 	}
 
-	stocks, err := handler.listStocksUC.Execute(limit)
+	o, err := strconv.Atoi(offsetStr)
+
+	if err == nil {
+		offset = o
+	}
+
+	stocks, err := handler.listStocksUC.Execute(limit, offset)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 		return
@@ -47,7 +57,27 @@ func (handler *StockHandler) GetStocks(response http.ResponseWriter, request *ht
 }
 
 func (handler *StockHandler) GetRecommendations(response http.ResponseWriter, request *http.Request) {
-	recs, err := handler.recommendationUC.Execute()
+	query := request.URL.Query()
+
+	limitStr := query.Get("limit")
+	limit := 10 // default
+
+	offsetStr := query.Get("offset")
+	offset := 0 // default
+
+	l, err := strconv.Atoi(limitStr)
+
+	if err == nil {
+		limit = l
+	}
+
+	o, err := strconv.Atoi(offsetStr)
+
+	if err == nil {
+		offset = o
+	}
+
+	recs, err := handler.recommendationUC.Execute(limit, offset)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 		return

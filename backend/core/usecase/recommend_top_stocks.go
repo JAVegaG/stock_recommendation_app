@@ -13,6 +13,6 @@ func NewRecommendTopStocksUseCase(svc *service.StockService) *RecommendTopStocks
 	return &RecommendTopStocksUseCase{stockService: svc}
 }
 
-func (useCase *RecommendTopStocksUseCase) Execute() ([]*domain.Stock, error) {
-	return useCase.stockService.GetRecommendations()
+func (useCase *RecommendTopStocksUseCase) Execute(limit int, offset int) ([]*domain.Stock, error) {
+	return useCase.stockService.GetRecommendations(limit, offset)
 }

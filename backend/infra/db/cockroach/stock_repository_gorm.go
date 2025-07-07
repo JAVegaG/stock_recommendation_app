@@ -35,10 +35,10 @@ func (r *gormStockRepository) Save(stock *domain.Stock) error {
 	return r.db.Create(model).Error
 }
 
-func (r *gormStockRepository) FindRecent(limit int) ([]*domain.Stock, error) {
+func (r *gormStockRepository) FindRecent(limit int, offset int) ([]*domain.Stock, error) {
 	var models []StockModel
 
-	queryResult := r.db.Order("time desc").Limit(limit).Find(&models)
+	queryResult := r.db.Order("time desc").Offset(offset).Limit(limit).Find(&models)
 
 	err := queryResult.Error
 
@@ -49,10 +49,75 @@ func (r *gormStockRepository) FindRecent(limit int) ([]*domain.Stock, error) {
 	return toDomainList(models), nil
 }
 
-func (r *gormStockRepository) FindRecommendations() ([]*domain.Stock, error) {
+func (r *gormStockRepository) FindRecommendations(limit int, offset int) ([]*domain.Stock, error) {
 	var models []StockModel
 
-	queryResult := r.db.Where("rating_from != rating_to").Order("time desc").Limit(10).Find(&models)
+	query := `
+    SELECT *
+    FROM stock_models
+    WHERE (rating_from != rating_to
+      AND (
+        CASE rating_to
+          WHEN 'Strong Sell' THEN 0
+          WHEN 'Sell' THEN 1
+          WHEN 'Underperform' THEN 2
+          WHEN 'Reduce' THEN 3
+          WHEN 'Hold' THEN 4
+          WHEN 'Neutral' THEN 5
+          WHEN 'Equal Weight' THEN 6
+          WHEN 'Market Perform' THEN 7
+          WHEN 'In-Line' THEN 8
+          WHEN 'Sector Weight' THEN 9
+          WHEN 'Sector Perform' THEN 10
+          WHEN 'Outperform' THEN 11
+          WHEN 'Market Outperform' THEN 12
+          WHEN 'Overweight' THEN 13
+          WHEN 'Sector Outperform' THEN 14
+          WHEN 'Outperformer' THEN 15
+          WHEN 'Positive' THEN 16
+          WHEN 'Mkt Outperform' THEN 17
+          WHEN 'Speculative Buy' THEN 18
+          WHEN 'Moderate Buy' THEN 19
+          WHEN 'Buy' THEN 20
+          WHEN 'Strong-Buy' THEN 21
+          WHEN 'Top Pick' THEN 22
+          ELSE -1
+        END
+      )
+      >
+      (
+        CASE rating_from
+          WHEN 'Strong Sell' THEN 0
+          WHEN 'Sell' THEN 1
+          WHEN 'Underperform' THEN 2
+          WHEN 'Reduce' THEN 3
+          WHEN 'Hold' THEN 4
+          WHEN 'Neutral' THEN 5
+          WHEN 'Equal Weight' THEN 6
+          WHEN 'Market Perform' THEN 7
+          WHEN 'In-Line' THEN 8
+          WHEN 'Sector Weight' THEN 9
+          WHEN 'Sector Perform' THEN 10
+          WHEN 'Outperform' THEN 11
+          WHEN 'Market Outperform' THEN 12
+          WHEN 'Overweight' THEN 13
+          WHEN 'Sector Outperform' THEN 14
+          WHEN 'Outperformer' THEN 15
+          WHEN 'Positive' THEN 16
+          WHEN 'Mkt Outperform' THEN 17
+          WHEN 'Speculative Buy' THEN 18
+          WHEN 'Moderate Buy' THEN 19
+          WHEN 'Buy' THEN 20
+          WHEN 'Strong-Buy' THEN 21
+          WHEN 'Top Pick' THEN 22
+          ELSE -1
+        END
+	)) OR rating_to = 'Top Pick'
+    ORDER BY time DESC
+    LIMIT ? OFFSET ?;
+    `
+
+	queryResult := r.db.Raw(query, limit, offset).Scan(&models)
 
 	err := queryResult.Error
 
