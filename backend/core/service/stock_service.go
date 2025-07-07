@@ -17,10 +17,10 @@ func (s *StockService) SaveStock(stock *domain.Stock) error {
 	return s.repo.Save(stock)
 }
 
-func (s *StockService) GetRecentStocks(limit int, offset int) ([]*domain.Stock, error) {
-	return s.repo.FindRecent(limit, offset)
+func (s *StockService) GetRecentStocks(limit int, offset int, filterOptions *domain.StockFilterOptions) (*domain.StockListResponse, error) {
+	return s.repo.FindAll(limit, offset, filterOptions)
 }
 
-func (s *StockService) GetRecommendations(limit int, offset int) ([]*domain.Stock, error) {
-	return s.repo.FindRecommendations(limit, offset)
+func (s *StockService) GetRecommendations(limit int, offset int, filterOptions *domain.StockFilterOptions) (*domain.StockListResponse, error) {
+	return s.repo.FindRecommendations(limit, offset, filterOptions)
 }

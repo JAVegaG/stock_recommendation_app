@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 )
 
@@ -51,6 +52,12 @@ func main() {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(responseMiddleware.ResponseWrapper)
+
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{os.Getenv("CORS_ORIGIN")},
+		AllowedMethods: []string{"GET"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+	}))
 
 	// 7. Registrar rutas
 	stockHandler.RegisterRoutes(router)

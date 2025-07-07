@@ -16,3 +16,15 @@ type Stock struct {
 	RatingTo   string
 	Time       time.Time
 }
+
+type StockListResponse struct {
+	Items []*Stock
+	Total int64
+}
+
+type StockFilterOptions struct {
+	Company     string
+	TargetToMin float64
+	TargetToMax float64
+	RatingTo    string
+}

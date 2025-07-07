@@ -13,8 +13,8 @@ func NewListStocksUseCase(svc *service.StockService) *ListStocksUseCase {
 	return &ListStocksUseCase{stockService: svc}
 }
 
-func (useCase *ListStocksUseCase) Execute(limit int, offset int) ([]*domain.Stock, error) {
-	recs, err := useCase.stockService.GetRecentStocks(limit, offset)
+func (useCase *ListStocksUseCase) Execute(limit int, offset int, filterOptions *domain.StockFilterOptions) (*domain.StockListResponse, error) {
+	recs, err := useCase.stockService.GetRecentStocks(limit, offset, filterOptions)
 	if err != nil {
 		return nil, err
 	}

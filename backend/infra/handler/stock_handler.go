@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"JAVegaG/StockRecommendationAPI/core/domain"
 	"JAVegaG/StockRecommendationAPI/core/usecase"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
@@ -29,25 +31,10 @@ func (handler *StockHandler) RegisterRoutes(routes chi.Router) {
 func (handler *StockHandler) GetStocks(response http.ResponseWriter, request *http.Request) {
 	query := request.URL.Query()
 
-	limitStr := query.Get("limit")
-	limit := 10 // default
+	listQueryParams := getListQueryParams(&query)
+	filterOptions := getFilterQueryParams(&query)
 
-	offsetStr := query.Get("offset")
-	offset := 0 // default
-
-	l, err := strconv.Atoi(limitStr)
-
-	if err == nil {
-		limit = l
-	}
-
-	o, err := strconv.Atoi(offsetStr)
-
-	if err == nil {
-		offset = o
-	}
-
-	stocks, err := handler.listStocksUC.Execute(limit, offset)
+	stocks, err := handler.listStocksUC.Execute(listQueryParams.limit, listQueryParams.offset, filterOptions)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 		return
@@ -57,27 +44,13 @@ func (handler *StockHandler) GetStocks(response http.ResponseWriter, request *ht
 }
 
 func (handler *StockHandler) GetRecommendations(response http.ResponseWriter, request *http.Request) {
+
 	query := request.URL.Query()
 
-	limitStr := query.Get("limit")
-	limit := 10 // default
+	listQueryParams := getListQueryParams(&query)
+	filterOptions := getFilterQueryParams(&query)
 
-	offsetStr := query.Get("offset")
-	offset := 0 // default
-
-	l, err := strconv.Atoi(limitStr)
-
-	if err == nil {
-		limit = l
-	}
-
-	o, err := strconv.Atoi(offsetStr)
-
-	if err == nil {
-		offset = o
-	}
-
-	recs, err := handler.recommendationUC.Execute(limit, offset)
+	recs, err := handler.recommendationUC.Execute(listQueryParams.limit, listQueryParams.offset, filterOptions)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 		return
@@ -86,4 +59,67 @@ func (handler *StockHandler) GetRecommendations(response http.ResponseWriter, re
 	response.Header().Set("Content-Type", "application/json") // Set Content-Type
 
 	json.NewEncoder(response).Encode(recs)
+}
+
+type listQueryParams struct {
+	limit  int
+	offset int
+}
+
+func getListQueryParams(queryObject *url.Values) listQueryParams {
+	limitStr := queryObject.Get("limit")
+	limit := 10 // default
+
+	l, err := strconv.Atoi(limitStr)
+
+	if err == nil {
+		limit = l
+	}
+
+	offsetStr := queryObject.Get("offset")
+	offset := 0 // default
+
+	o, err := strconv.Atoi(offsetStr)
+
+	if err == nil {
+		offset = o
+	}
+
+	return listQueryParams{
+		limit,
+		offset,
+	}
+}
+
+func getFilterQueryParams(queryObject *url.Values) *domain.StockFilterOptions {
+	var (
+		Company     string
+		TargetToMin float64
+		TargetToMax float64
+		RatingTo    string
+	)
+
+	Company = queryObject.Get("company")
+	RatingTo = queryObject.Get("rating-to")
+	targetToMinStr := queryObject.Get("target-to-min")
+	targetToMaxStr := queryObject.Get("target-to-max")
+
+	ttmin, err := strconv.ParseFloat(targetToMinStr, 64)
+
+	if err == nil {
+		TargetToMin = ttmin
+	}
+
+	ttmax, err := strconv.ParseFloat(targetToMaxStr, 64)
+
+	if err == nil {
+		TargetToMax = ttmax
+	}
+
+	return &domain.StockFilterOptions{
+		Company:     Company,
+		TargetToMin: TargetToMin,
+		TargetToMax: TargetToMax,
+		RatingTo:    RatingTo,
+	}
 }

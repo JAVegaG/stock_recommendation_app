@@ -1,4 +1,4 @@
 export interface IEndpoints {
-    get: string
-    getRecommendations: string
-} 
+  get: string
+  getRecommendations: string
+}
