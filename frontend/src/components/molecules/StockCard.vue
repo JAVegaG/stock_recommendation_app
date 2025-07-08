@@ -1,10 +1,8 @@
 <template>
   <div class="max-w-sm mx-auto">
     <!-- Basic Card View -->
-    <div
-      v-if="!showDetails"
-      class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden h-[27rem] flex flex-col gap-2"
-    >
+    <div v-if="!showDetails"
+      class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden h-[27rem] flex flex-col gap-2">
       <!-- Header with Ticker -->
       <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-4 text-white">
         <div class="flex items-center justify-between">
@@ -38,12 +36,10 @@
         <!-- Action Badge -->
         <template v-if="!!getActionIcon(stock.RatingTo)">
           <div class="flex justify-center">
-            <span
-              :class="[
-                'inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold',
-                getActionColor(stock.RatingTo),
-              ]"
-            >
+            <span :class="[
+              'inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold',
+              getActionColor(stock.RatingTo),
+            ]">
               <component :is="getActionIcon(stock.RatingTo)" class="w-4 h-4 mr-2" />
               {{ stock.RatingTo }}
             </span>
@@ -51,14 +47,12 @@
         </template>
 
         <!-- Update Info -->
-        <div
-          class="flex items-center justify-between text-sm text-gray-600 bg-gray-50 rounded-lg p-3"
-        >
-          <div class="flex items-center">
+        <div class="flex items-center justify-between text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+          <div class="flex items-center w-32">
             <Clock class="w-4 h-4 mr-2" />
             <span>Updated {{ formatTimeAgo(stock.Time) }}</span>
           </div>
-          <div class="text-xs text-gray-500">{{ stock.Brokerage }}</div>
+          <p class="text-xs text-gray-500 w-32">{{ stock.Brokerage }}</p>
         </div>
       </div>
 
@@ -74,10 +68,8 @@
     </div>
 
     <!-- Detailed Card View -->
-    <div
-      v-else
-      class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200 overflow-hidden"
-    >
+    <div v-else
+      class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200 overflow-hidden w-[22rem]">
       <!-- Header -->
       <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-6 text-white">
         <div class="flex items-start justify-between">
@@ -85,10 +77,7 @@
             <h2 class="text-3xl font-bold mb-1">{{ stock.Ticker }}</h2>
             <p class="text-slate-300 text-lg">{{ stock.Company }}</p>
           </div>
-          <button
-            @click="showDetails = false"
-            class="text-slate-300 hover:text-white transition-colors"
-          >
+          <button @click="showDetails = false" class="text-slate-300 hover:text-white transition-colors">
             <X class="w-6 h-6" />
           </button>
         </div>
@@ -97,8 +86,7 @@
       <div class="p-6 space-y-6 flex flex-col gap-4">
         <!-- Price Analysis -->
         <div
-          class="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-5 border border-gray-200 flex flex-col gap-2"
-        >
+          class="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-5 border border-gray-200 flex flex-col gap-2">
           <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
             <Target class="w-5 h-5 mr-2 text-blue-600" />
             Price Targets

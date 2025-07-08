@@ -53,7 +53,7 @@ func (r *gormStockRepository) FindAll(limit int, offset int, filterOptions *doma
 	}
 
 	if filterOptions.TargetToMin != 0 {
-		countResult = countResult.Where("target_to >= ?", filterOptions.Company)
+		countResult = countResult.Where("target_to >= ?", filterOptions.TargetToMin)
 		queryResult = queryResult.Where("target_to >= ?", filterOptions.TargetToMin)
 	}
 
