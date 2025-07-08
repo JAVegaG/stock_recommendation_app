@@ -1,13 +1,18 @@
 <template>
   <DefaultLayout>
     <template #nav>
-      <h1 class="text-xl font-bold">Recommendations </h1>
+      <h1 class="text-xl font-bold">Recommendations</h1>
     </template>
     <template v-if="store.recommendations.length > 0">
       <StockList :stocks="store.recommendations" />
-      <StockPagination :current-page="store.currentPage" :total-items="store.totalItems" :total-pages="store.totalPages"
-        :items-per-page="store.itemsPerPage" @update:items-per-page="store.setItemsPerPage"
-        @update:current-page="store.setCurrentPage" />
+      <StockPagination
+        :current-page="store.currentPage"
+        :total-items="store.totalItems"
+        :total-pages="store.totalPages"
+        :items-per-page="store.itemsPerPage"
+        @update:items-per-page="store.setItemsPerPage"
+        @update:current-page="store.setCurrentPage"
+      />
     </template>
     <p v-else>Data Not Found</p>
   </DefaultLayout>

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import StockCard from '@/components/molecules/StockCard.vue';
-import type { Stock } from '@/types/stock';
+import StockCard from '@/components/molecules/StockCard.vue'
+import type { Stock } from '@/types/stock'
 const props = defineProps<{ stocks: Stock[] }>()
 </script>

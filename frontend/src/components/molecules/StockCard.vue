@@ -1,8 +1,10 @@
 <template>
   <div class="max-w-sm mx-auto">
     <!-- Basic Card View -->
-    <div v-if="!showDetails"
-      class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden h-[27rem] flex flex-col gap-2">
+    <div
+      v-if="!showDetails"
+      class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden h-[27rem] flex flex-col gap-2"
+    >
       <!-- Header with Ticker -->
       <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-4 text-white">
         <div class="flex items-center justify-between">
@@ -20,11 +22,15 @@
       <div class="p-6 space-y-4 flex flex-col gap-4 h-full justify-between">
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-            <div class="text-green-600 text-xs font-semibold uppercase tracking-wide mb-1">Target Min</div>
+            <div class="text-green-600 text-xs font-semibold uppercase tracking-wide mb-1">
+              Target Min
+            </div>
             <div class="text-green-800 text-xl font-bold">${{ stock.TargetFrom.toFixed(2) }}</div>
           </div>
           <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-            <div class="text-blue-600 text-xs font-semibold uppercase tracking-wide mb-1">Target Max</div>
+            <div class="text-blue-600 text-xs font-semibold uppercase tracking-wide mb-1">
+              Target Max
+            </div>
             <div class="text-blue-800 text-xl font-bold">${{ stock.TargetTo.toFixed(2) }}</div>
           </div>
         </div>
@@ -32,10 +38,12 @@
         <!-- Action Badge -->
         <template v-if="!!getActionIcon(stock.RatingTo)">
           <div class="flex justify-center">
-            <span :class="[
-              'inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold',
-              getActionColor(stock.RatingTo)
-            ]">
+            <span
+              :class="[
+                'inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold',
+                getActionColor(stock.RatingTo),
+              ]"
+            >
               <component :is="getActionIcon(stock.RatingTo)" class="w-4 h-4 mr-2" />
               {{ stock.RatingTo }}
             </span>
@@ -43,7 +51,9 @@
         </template>
 
         <!-- Update Info -->
-        <div class="flex items-center justify-between text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+        <div
+          class="flex items-center justify-between text-sm text-gray-600 bg-gray-50 rounded-lg p-3"
+        >
           <div class="flex items-center">
             <Clock class="w-4 h-4 mr-2" />
             <span>Updated {{ formatTimeAgo(stock.Time) }}</span>
@@ -53,7 +63,7 @@
       </div>
 
       <!-- Ver más button -->
-      <div class="px-6 pb-6" style="margin-top: auto;">
+      <div class="px-6 pb-6" style="margin-top: auto">
         <BaseButton @click="showDetails = true" class="w-full group">
           <span class="flex items-center justify-center">
             View details
@@ -64,8 +74,10 @@
     </div>
 
     <!-- Detailed Card View -->
-    <div v-else
-      class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200 overflow-hidden ">
+    <div
+      v-else
+      class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200 overflow-hidden"
+    >
       <!-- Header -->
       <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-6 text-white">
         <div class="flex items-start justify-between">
@@ -73,7 +85,10 @@
             <h2 class="text-3xl font-bold mb-1">{{ stock.Ticker }}</h2>
             <p class="text-slate-300 text-lg">{{ stock.Company }}</p>
           </div>
-          <button @click="showDetails = false" class="text-slate-300 hover:text-white transition-colors">
+          <button
+            @click="showDetails = false"
+            class="text-slate-300 hover:text-white transition-colors"
+          >
             <X class="w-6 h-6" />
           </button>
         </div>
@@ -82,14 +97,17 @@
       <div class="p-6 space-y-6 flex flex-col gap-4">
         <!-- Price Analysis -->
         <div
-          class="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-5 border border-gray-200 flex flex-col gap-2">
+          class="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-5 border border-gray-200 flex flex-col gap-2"
+        >
           <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
             <Target class="w-5 h-5 mr-2 text-blue-600" />
             Price Targets
           </h3>
           <div class="grid grid-cols-2 gap-4">
             <div class="text-center">
-              <div class="text-2xl font-bold text-green-600">${{ stock.TargetFrom.toFixed(2) }}</div>
+              <div class="text-2xl font-bold text-green-600">
+                ${{ stock.TargetFrom.toFixed(2) }}
+              </div>
               <div class="text-sm text-gray-600">Minimum Target</div>
             </div>
             <div class="text-center">
@@ -105,7 +123,7 @@
         </div>
 
         <!-- Rating Change -->
-        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm ">
+        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
           <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center pb-2">
             Rating Update
           </h3>
@@ -157,9 +175,9 @@
 </template>
 
 <script setup lang="ts">
-import BaseButton from '@/components/atoms/BaseButton.vue';
-import type { Stock } from '@/types/stock';
-import { ref } from 'vue';
+import BaseButton from '@/components/atoms/BaseButton.vue'
+import type { Stock } from '@/types/stock'
+import { ref } from 'vue'
 const props = defineProps<{ stock: Stock }>()
 
 import {
@@ -173,8 +191,8 @@ import {
   Star,
   Target,
   TrendingUp,
-  X
-} from 'lucide-vue-next';
+  X,
+} from 'lucide-vue-next'
 
 // Reactive state
 const showDetails = ref(false)
@@ -188,7 +206,7 @@ const formatTime = (timeString: string) => {
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     })
   } catch {
     return timeString
@@ -244,6 +262,6 @@ const getActionIcon = (action: string) => {
 const calculatePotential = (stock: Stock) => {
   const avg = (stock.TargetFrom + stock.TargetTo) / 2
   const current = stock.TargetFrom // Assuming current price is the lower target for demo
-  return ((avg - current) / current * 100).toFixed(1)
+  return (((avg - current) / current) * 100).toFixed(1)
 }
 </script>

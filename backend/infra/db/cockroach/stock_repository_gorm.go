@@ -43,8 +43,8 @@ func (r *gormStockRepository) FindAll(limit int, offset int, filterOptions *doma
 	queryResult := r.db.Order("time desc")
 
 	if filterOptions.Company != "" {
-		countResult = countResult.Where("company LIKE ?", filterOptions.Company+"%")
-		queryResult = queryResult.Where("company LIKE ?", filterOptions.Company+"%")
+		countResult = countResult.Where("company ILIKE ?", filterOptions.Company+"%")
+		queryResult = queryResult.Where("company ILIKE ?", filterOptions.Company+"%")
 	}
 
 	if filterOptions.RatingTo != "" {
@@ -89,11 +89,14 @@ func (r *gormStockRepository) FindAll(limit int, offset int, filterOptions *doma
 func (r *gormStockRepository) FindRecommendations(limit int, offset int, filterOptions *domain.StockFilterOptions) (*domain.StockListResponse, error) {
 	var models []StockModel
 	var total int64
+	var baseOptions []interface{}
 
-	countQuery := `
-    SELECT COUNT(*)
-    FROM stock_models
-    WHERE (rating_from != rating_to
+	baseQuery := `FROM
+  stock_models
+  WHERE
+  (
+    (
+      rating_from != rating_to
       AND (
         CASE rating_to
           WHEN 'Strong Sell' THEN 0
@@ -121,9 +124,7 @@ func (r *gormStockRepository) FindRecommendations(limit int, offset int, filterO
           WHEN 'Top Pick' THEN 22
           ELSE -1
         END
-      )
-      >
-      (
+      ) > (
         CASE rating_from
           WHEN 'Strong Sell' THEN 0
           WHEN 'Sell' THEN 1
@@ -150,83 +151,51 @@ func (r *gormStockRepository) FindRecommendations(limit int, offset int, filterO
           WHEN 'Top Pick' THEN 22
           ELSE -1
         END
-	)) OR rating_to = 'Top Pick'
-    `
+      )
+    )
+    OR rating_to = 'Top Pick'
+  )`
 
-	countResult := r.db.Raw(countQuery).Scan(&total)
+	countQuery := "SELECT COUNT(*) " + baseQuery
+
+	selectQuery := "SELECT * " + baseQuery
+
+	if filterOptions.Company != "" {
+		countQuery = countQuery + " AND company ILIKE ?"
+		selectQuery = selectQuery + " AND company ILIKE ?"
+		baseOptions = append(baseOptions, filterOptions.Company+"%")
+	}
+
+	if filterOptions.RatingTo != "" {
+		countQuery = countQuery + " AND rating_to = ?"
+		selectQuery = selectQuery + " AND rating_to = ?"
+		baseOptions = append(baseOptions, filterOptions.RatingTo)
+	}
+
+	if filterOptions.TargetToMin != 0 {
+		countQuery = countQuery + " AND target_to >= ?"
+		selectQuery = selectQuery + " AND target_to >= ?"
+		baseOptions = append(baseOptions, filterOptions.TargetToMin)
+	}
+
+	if filterOptions.TargetToMax != 0 {
+		countQuery = countQuery + " AND target_to <= ?"
+		selectQuery = selectQuery + " AND target_to <= ?"
+		baseOptions = append(baseOptions, filterOptions.TargetToMax)
+	}
+
+	countQuery = countQuery + ";"
+	selectQuery = selectQuery + " ORDER BY time DESC LIMIT ? OFFSET ?;"
+	selectOptions := append(baseOptions, limit, offset)
+
+	countResult := r.db.Raw(countQuery, baseOptions...).Scan(&total)
+	queryResult := r.db.Raw(selectQuery, selectOptions...).Scan(&models)
 
 	err := countResult.Error
 
 	if err != nil {
 		return nil, err
 	}
-
-	query := `
-    SELECT *
-    FROM stock_models
-    WHERE (rating_from != rating_to
-      AND (
-        CASE rating_to
-          WHEN 'Strong Sell' THEN 0
-          WHEN 'Sell' THEN 1
-          WHEN 'Underperform' THEN 2
-          WHEN 'Reduce' THEN 3
-          WHEN 'Hold' THEN 4
-          WHEN 'Neutral' THEN 5
-          WHEN 'Equal Weight' THEN 6
-          WHEN 'Market Perform' THEN 7
-          WHEN 'In-Line' THEN 8
-          WHEN 'Sector Weight' THEN 9
-          WHEN 'Sector Perform' THEN 10
-          WHEN 'Outperform' THEN 11
-          WHEN 'Market Outperform' THEN 12
-          WHEN 'Overweight' THEN 13
-          WHEN 'Sector Outperform' THEN 14
-          WHEN 'Outperformer' THEN 15
-          WHEN 'Positive' THEN 16
-          WHEN 'Mkt Outperform' THEN 17
-          WHEN 'Speculative Buy' THEN 18
-          WHEN 'Moderate Buy' THEN 19
-          WHEN 'Buy' THEN 20
-          WHEN 'Strong-Buy' THEN 21
-          WHEN 'Top Pick' THEN 22
-          ELSE -1
-        END
-      )
-      >
-      (
-        CASE rating_from
-          WHEN 'Strong Sell' THEN 0
-          WHEN 'Sell' THEN 1
-          WHEN 'Underperform' THEN 2
-          WHEN 'Reduce' THEN 3
-          WHEN 'Hold' THEN 4
-          WHEN 'Neutral' THEN 5
-          WHEN 'Equal Weight' THEN 6
-          WHEN 'Market Perform' THEN 7
-          WHEN 'In-Line' THEN 8
-          WHEN 'Sector Weight' THEN 9
-          WHEN 'Sector Perform' THEN 10
-          WHEN 'Outperform' THEN 11
-          WHEN 'Market Outperform' THEN 12
-          WHEN 'Overweight' THEN 13
-          WHEN 'Sector Outperform' THEN 14
-          WHEN 'Outperformer' THEN 15
-          WHEN 'Positive' THEN 16
-          WHEN 'Mkt Outperform' THEN 17
-          WHEN 'Speculative Buy' THEN 18
-          WHEN 'Moderate Buy' THEN 19
-          WHEN 'Buy' THEN 20
-          WHEN 'Strong-Buy' THEN 21
-          WHEN 'Top Pick' THEN 22
-          ELSE -1
-        END
-	)) OR rating_to = 'Top Pick'
-    ORDER BY time DESC
-    LIMIT ? OFFSET ?;
-    `
-
-	queryResult := r.db.Raw(query, limit, offset).Scan(&models)
 
 	err = queryResult.Error
 
