@@ -9,7 +9,11 @@
     </div>
 
     <template v-if="store.stocks.length > 0">
-      <StockList :stocks="store.stocks" />
+      <StockList
+        :stocks="store.stocks"
+        :is-loading="store.isLoading"
+        :items-per-page="store.itemsPerPage"
+      />
       <StockPagination
         :current-page="store.currentPage"
         :total-items="store.totalItems"

@@ -1,6 +1,7 @@
 <template>
   <div
-    class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+    class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200"
+  >
     <!-- Información de resultados -->
     <div class="text-sm text-gray-600 order-2 sm:order-1">
       <span class="font-medium">
@@ -12,33 +13,54 @@
     <!-- Controles de navegación -->
     <div class="flex items-center gap-3 order-1 sm:order-2">
       <!-- Botón Anterior -->
-      <BaseButton variant="secondary" size="sm" :disabled="currentPage <= 1 || loading" :icon-left="ChevronLeft"
-        @click="goToPreviousPage" class="flex-shrink-0">
+      <BaseButton
+        variant="secondary"
+        size="sm"
+        :disabled="currentPage <= 1 || loading"
+        :icon-left="ChevronLeft"
+        @click="goToPreviousPage"
+        class="flex-shrink-0"
+      >
         <span class="hidden sm:inline">Previous</span>
       </BaseButton>
 
       Current page data
       <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border">
         <span class="text-sm font-medium text-gray-700"> Page </span>
-        <input v-model.number="pageInput" @keyup.enter="goToPage" @blur="goToPage" type="number" :min="1"
+        <input
+          v-model.number="pageInput"
+          @keyup.enter="goToPage"
+          @blur="goToPage"
+          type="number"
+          :min="1"
           :max="totalPagesLocal"
           class="w-12 text-center text-sm font-semibold bg-transparent border-none outline-none text-gray-800"
-          :disabled="loading" />
+          :disabled="loading"
+        />
         <span class="text-sm text-gray-500"> of {{ totalPagesLocal }} </span>
       </div>
 
       <!-- Botón Siguiente -->
-      <BaseButton variant="secondary" size="sm" :disabled="currentPage >= totalPagesLocal || loading"
-        :icon-right="ChevronRight" @click="goToNextPage" class="flex-shrink-0">
+      <BaseButton
+        variant="secondary"
+        size="sm"
+        :disabled="currentPage >= totalPagesLocal || loading"
+        :icon-right="ChevronRight"
+        @click="goToNextPage"
+        class="flex-shrink-0"
+      >
         <span class="hidden sm:inline">Next</span>
       </BaseButton>
     </div>
 
     <div class="flex items-center gap-2 text-sm text-gray-600 order-3">
       <span>Show:</span>
-      <select v-model="itemsPerPageLocal" @change="changeItemsPerPage"
+      <select
+        v-model="itemsPerPageLocal"
+        @change="changeItemsPerPage"
         class="px-2 py-1 border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        :disabled="loading">
+        :disabled="loading"
+      >
         <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
           {{ option }}
         </option>
@@ -51,9 +73,13 @@
   <div v-if="totalPagesLocal > 5 && !isMobile" class="flex justify-center mt-4">
     <div class="flex items-center gap-1 bg-white rounded-lg shadow-sm border border-gray-200 p-2">
       <!-- Primera página -->
-      <button v-if="showFirstPage" @click="goToSpecificPage(1)" :disabled="loading"
+      <button
+        v-if="showFirstPage"
+        @click="goToSpecificPage(1)"
+        :disabled="loading"
         class="w-8 h-8 flex items-center justify-center text-sm font-medium rounded-md transition-colors hover:bg-gray-100 disabled:opacity-50"
-        :class="currentPage === 1 ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-gray-700'">
+        :class="currentPage === 1 ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-gray-700'"
+      >
         1
       </button>
 
@@ -61,9 +87,14 @@
       <span v-if="showLeftEllipsis" class="px-2 text-gray-400">...</span>
 
       <!-- Páginas visibles -->
-      <button v-for="page in visiblePages" :key="page" @click="goToSpecificPage(page)" :disabled="loading"
+      <button
+        v-for="page in visiblePages"
+        :key="page"
+        @click="goToSpecificPage(page)"
+        :disabled="loading"
         class="w-8 h-8 flex items-center justify-center text-sm font-medium rounded-md transition-colors hover:bg-gray-100 disabled:opacity-50"
-        :class="currentPage === page ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-gray-700'">
+        :class="currentPage === page ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-gray-700'"
+      >
         {{ page }}
       </button>
 
@@ -71,10 +102,17 @@
       <span v-if="showRightEllipsis" class="px-2 text-gray-400">...</span>
 
       <!-- Última página -->
-      <button v-if="showLastPage" @click="goToSpecificPage(totalPagesLocal)" :disabled="loading"
+      <button
+        v-if="showLastPage"
+        @click="goToSpecificPage(totalPagesLocal)"
+        :disabled="loading"
         class="w-8 h-8 flex items-center justify-center text-sm font-medium rounded-md transition-colors hover:bg-gray-100 disabled:opacity-50"
-        :class="currentPage === totalPagesLocal ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-gray-700'
-          ">
+        :class="
+          currentPage === totalPagesLocal
+            ? 'bg-blue-600 text-white hover:bg-blue-700'
+            : 'text-gray-700'
+        "
+      >
         {{ totalPagesLocal }}
       </button>
     </div>
@@ -162,7 +200,8 @@ const showLastPage = computed(
 const showLeftEllipsis = computed(() => showFirstPage.value && visiblePages.value[0] > 2)
 const showRightEllipsis = computed(
   () =>
-    showLastPage.value && visiblePages.value[visiblePages.value.length - 1] < totalPagesLocal.value - 1,
+    showLastPage.value &&
+    visiblePages.value[visiblePages.value.length - 1] < totalPagesLocal.value - 1,
 )
 
 // Methods

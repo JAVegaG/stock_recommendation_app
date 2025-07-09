@@ -5,7 +5,7 @@
     @click="handleClick"
     v-bind="$attrs"
   >
-    <span v-if="loading" class="flex items-center justify-center">
+    <span v-if="loading" class="flex items-center justify-center gap-2">
       <svg
         class="animate-spin -ml-1 mr-3 h-4 w-4"
         xmlns="http://www.w3.org/2000/svg"
@@ -26,7 +26,7 @@
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
         ></path>
       </svg>
-      {{ loadingText || 'Cargando...' }}
+      {{ loadingText || 'Loading...' }}
     </span>
     <span v-else class="flex items-center justify-center">
       <component v-if="iconLeft" :is="iconLeft" :class="iconClasses" />
@@ -38,18 +38,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-
-interface Props {
-  variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'ghost' | 'outline'
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  disabled?: boolean
-  loading?: boolean
-  loadingText?: string
-  iconLeft?: any
-  iconRight?: any
-  fullWidth?: boolean
-  rounded?: boolean
-}
+import type { Props } from './BaseButton.interface'
 
 const props = withDefaults(defineProps<Props>(), {
   variant: 'primary',

@@ -35,6 +35,5 @@ export const ratings = [
   'Sector Weight',
   'Top Pick',
   'Outperformer',
-  'Reduce'
+  'Reduce',
 ] as const
-

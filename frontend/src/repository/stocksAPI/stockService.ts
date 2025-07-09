@@ -16,7 +16,11 @@ export async function getRecommendations(
   return json.data as IStockListResponse
 }
 
-export async function getAll(limit?: number, offset: number = 0, filterOptions?: IFilterOptions): Promise<IStockListResponse> {
+export async function getAll(
+  limit?: number,
+  offset: number = 0,
+  filterOptions?: IFilterOptions,
+): Promise<IStockListResponse> {
   let url = `${endpoints.get}?offset=${offset}`
 
   if (limit) {
