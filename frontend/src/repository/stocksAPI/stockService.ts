@@ -5,12 +5,31 @@ import { endpoints } from './settings'
 export async function getRecommendations(
   limit?: number,
   offset: number = 0,
+  filterOptions?: IFilterOptions,
 ): Promise<IStockListResponse> {
-  const url = `${endpoints.getRecommendations}?offset=${offset}`
+  let url = `${endpoints.get}?offset=${offset}`
 
-  const finalURL = limit ? `${url}&limit=${limit}` : url
+  if (limit) {
+    url += `&limit=${limit}`
+  }
 
-  const res = await fetch(finalURL)
+  if (filterOptions?.Company) {
+    url += `&company=${filterOptions?.Company}`
+  }
+
+  if (filterOptions?.RatingTo) {
+    url += `&rating-to=${filterOptions?.RatingTo}`
+  }
+
+  if (filterOptions?.TargetToMin) {
+    url += `&target-to-min=${filterOptions?.TargetToMin}`
+  }
+
+  if (filterOptions?.TargetToMax) {
+    url += `&target-to-max=${filterOptions?.TargetToMax}`
+  }
+
+  const res = await fetch(url)
   const json = await res.json()
 
   return json.data as IStockListResponse

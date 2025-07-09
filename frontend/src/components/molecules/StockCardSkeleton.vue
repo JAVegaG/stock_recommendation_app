@@ -69,8 +69,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import BaseButton from '@/components/atoms/BaseButton.vue'
-import type { Stock } from '@/types/stock'
+import BaseButton from '@/components/atoms/BaseButton.vue';
 
-import { ChevronRight } from 'lucide-vue-next'
+import { ChevronRight } from 'lucide-vue-next';
 </script>

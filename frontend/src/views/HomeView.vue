@@ -14,7 +14,11 @@
         :items-per-page="store.itemsPerPage" @update:items-per-page="store.setItemsPerPage"
         @update:current-page="store.setCurrentPage" />
     </template>
-    <p v-else>Data Not Found</p>
+    <template v-else>
+      <div>
+        Data Not Found
+      </div>
+    </template>
   </DefaultLayout>
 </template>
 

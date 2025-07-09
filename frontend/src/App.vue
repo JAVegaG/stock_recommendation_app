@@ -22,6 +22,10 @@ header {
   max-height: 100vh;
 }
 
+.wrapper {
+  width: 100%;
+}
+
 nav {
   width: 100%;
   font-size: 12px;
@@ -51,10 +55,6 @@ nav a:first-of-type {
   header {
     display: flex;
     place-items: center;
-    width: 100%;
-  }
-
-  header .wrapper {
     width: 100%;
   }
 
