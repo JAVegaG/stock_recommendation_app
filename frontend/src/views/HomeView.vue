@@ -1,11 +1,14 @@
 <template>
   <DefaultLayout>
-    <div class="flex py-12 justify-between items-center gap-4">
-      <h1 class="text-xl font-bold">Stocks</h1>
-      <div class="flex gap-2 items-center">
-        <SearchBar v-model="company" />
-        <AdvancedFilters v-model="filtersWithoutCompany" />
+    <div class="pb-6">
+      <div class="flex pb-6 justify-between items-center gap-4">
+        <h1 class="text-xl font-bold">Stocks</h1>
+        <div class="flex gap-2 items-center">
+          <SearchBar v-model="company" />
+          <AdvancedFilters v-model="filtersWithoutCompany" />
+        </div>
       </div>
+      <hr class="border mb-4 border-green-300 shadow" />
     </div>
 
     <template v-if="store.stocks.length > 0">

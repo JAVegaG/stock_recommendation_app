@@ -32,7 +32,12 @@ func (handler *StockHandler) GetStocks(response http.ResponseWriter, request *ht
 	query := request.URL.Query()
 
 	listQueryParams := getListQueryParams(&query)
-	filterOptions := getFilterQueryParams(&query)
+	filterOptions, err := getFilterQueryParams(&query)
+
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	stocks, err := handler.listStocksUC.Execute(listQueryParams.limit, listQueryParams.offset, filterOptions)
 	if err != nil {
@@ -48,7 +53,11 @@ func (handler *StockHandler) GetRecommendations(response http.ResponseWriter, re
 	query := request.URL.Query()
 
 	listQueryParams := getListQueryParams(&query)
-	filterOptions := getFilterQueryParams(&query)
+	filterOptions, err := getFilterQueryParams(&query)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	recs, err := handler.recommendationUC.Execute(listQueryParams.limit, listQueryParams.offset, filterOptions)
 	if err != nil {
@@ -91,7 +100,7 @@ func getListQueryParams(queryObject *url.Values) listQueryParams {
 	}
 }
 
-func getFilterQueryParams(queryObject *url.Values) *domain.StockFilterOptions {
+func getFilterQueryParams(queryObject *url.Values) (*domain.StockFilterOptions, error) {
 	var (
 		Company     string
 		TargetToMin float64
@@ -104,16 +113,24 @@ func getFilterQueryParams(queryObject *url.Values) *domain.StockFilterOptions {
 	targetToMinStr := queryObject.Get("target-to-min")
 	targetToMaxStr := queryObject.Get("target-to-max")
 
-	ttmin, err := strconv.ParseFloat(targetToMinStr, 64)
+	if targetToMinStr != "" {
+		ttmin, err := strconv.ParseFloat(targetToMinStr, 64)
 
-	if err == nil {
-		TargetToMin = ttmin
+		if err == nil {
+			TargetToMin = ttmin
+		} else {
+			return nil, err
+		}
 	}
 
-	ttmax, err := strconv.ParseFloat(targetToMaxStr, 64)
+	if targetToMaxStr != "" {
+		ttmax, err := strconv.ParseFloat(targetToMaxStr, 64)
 
-	if err == nil {
-		TargetToMax = ttmax
+		if err == nil {
+			TargetToMax = ttmax
+		} else {
+			return nil, err
+		}
 	}
 
 	return &domain.StockFilterOptions{
@@ -121,5 +138,5 @@ func getFilterQueryParams(queryObject *url.Values) *domain.StockFilterOptions {
 		TargetToMin: TargetToMin,
 		TargetToMax: TargetToMax,
 		RatingTo:    RatingTo,
-	}
+	}, nil
 }
