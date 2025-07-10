@@ -58,6 +58,11 @@ func main() {
 
 	stockHandler.RegisterRoutes(router)
 
+	router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
 	if strings.EqualFold(os.Getenv("SEED_API"), "true") {
 		err := storeUC.Execute()
 		if err != nil {
