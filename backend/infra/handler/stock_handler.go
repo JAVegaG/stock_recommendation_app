@@ -3,7 +3,9 @@ package handler
 import (
 	"JAVegaG/StockRecommendationAPI/core/domain"
 	"JAVegaG/StockRecommendationAPI/core/usecase"
+	"JAVegaG/StockRecommendationAPI/utils"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -35,13 +37,15 @@ func (handler *StockHandler) GetStocks(response http.ResponseWriter, request *ht
 	filterOptions, err := getFilterQueryParams(&query)
 
 	if err != nil {
-		http.Error(response, err.Error(), http.StatusBadRequest)
+		utils.Logger.InfoContext(request.Context(), "Error getting filters from query params", slog.String("error", err.Error()))
+		http.Error(response, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	stocks, err := handler.listStocksUC.Execute(listQueryParams.limit, listQueryParams.offset, filterOptions)
 	if err != nil {
-		http.Error(response, err.Error(), http.StatusInternalServerError)
+		utils.Logger.InfoContext(request.Context(), "Error getting stocks", slog.String("error", err.Error()))
+		http.Error(response, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	response.Header().Set("Content-Type", "application/json") // Set Content-Type
@@ -55,13 +59,15 @@ func (handler *StockHandler) GetRecommendations(response http.ResponseWriter, re
 	listQueryParams := getListQueryParams(&query)
 	filterOptions, err := getFilterQueryParams(&query)
 	if err != nil {
-		http.Error(response, err.Error(), http.StatusBadRequest)
+		utils.Logger.InfoContext(request.Context(), "Error getting filters from query params", slog.String("error", err.Error()))
+		http.Error(response, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	recs, err := handler.recommendationUC.Execute(listQueryParams.limit, listQueryParams.offset, filterOptions)
 	if err != nil {
-		http.Error(response, err.Error(), http.StatusInternalServerError)
+		utils.Logger.InfoContext(request.Context(), "Error getting stock recommendations", slog.String("error", err.Error()))
+		http.Error(response, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
