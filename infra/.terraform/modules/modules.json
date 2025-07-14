@@ -1,0 +1,1 @@
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"application","Source":"./modules/application","Dir":"modules/application"},{"Key":"database","Source":"./modules/database","Dir":"modules/database"},{"Key":"network","Source":"./modules/network","Dir":"modules/network"},{"Key":"network.subnets","Source":"./module/vpc_subnets","Dir":"modules/network/module/vpc_subnets"}]}
