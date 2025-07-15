@@ -7,13 +7,16 @@ import (
 	"JAVegaG/StockRecommendationAPI/infra/db/cockroach"
 	"JAVegaG/StockRecommendationAPI/infra/handler"
 	responseMiddleware "JAVegaG/StockRecommendationAPI/infra/middleware"
+	"JAVegaG/StockRecommendationAPI/utils"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/traceid"
 	"github.com/joho/godotenv"
 )
 
@@ -49,7 +52,8 @@ func main() {
 	stockHandler := handler.NewStockHandler(recommendUC, listUC)
 
 	router := chi.NewRouter()
-	router.Use(middleware.Logger)
+	router.Use(traceid.Middleware)
+	router.Use(utils.HttpRequestLogger)
 	router.Use(middleware.Recoverer)
 	router.Use(responseMiddleware.ResponseWrapper)
 
@@ -63,7 +67,7 @@ func main() {
 	stockHandler.RegisterRoutes(router)
 
 	// Ejecutar solo si quieres precargar
-	if os.Getenv("SEED_API") == "true" {
+	if strings.EqualFold(os.Getenv("SEED_API"), "true") {
 		err := storeUC.Execute()
 		if err != nil {
 			log.Fatalf("Error cargando datos desde el API externo: %v", err)
