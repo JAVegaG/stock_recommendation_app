@@ -21,3 +21,22 @@ variable "subnets" {
     availability_zone  = string
   }))
 }
+
+variable "security_group" {
+  description = "Security group configuration"
+  type = object({
+    name        = string
+    description = string
+    ingress_rules = list(object({
+      from_port   = number
+      to_port     = number
+      ip_protocol = string
+    }))
+    egress_rules = list(object({
+      cidr_ipv4   = string
+      from_port   = number
+      to_port     = number
+      ip_protocol = string
+    }))
+  })
+}

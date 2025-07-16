@@ -9,3 +9,7 @@ output "private_subnets" {
 output "public_subnets" {
   value = [for subnet in module.subnets : subnet.public_subnets.id]
 }
+
+output "security_groups" {
+  value = [for sg in aws_security_group.sg : sg.id]
+}

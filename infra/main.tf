@@ -18,6 +18,19 @@ module "network" {
     public_cidr_block  = "10.0.13.0/24",
     availability_zone  = "b"
   }]
+
+  security_group = {
+    ingress_rules = [{
+      from_port   = 80
+      to_port     = 80
+      ip_protocol = "tcp"
+    }]
+
+    egress_rules = [{
+      cidr_ipv4   = "0.0.0.0/0"
+      ip_protocol = "-1"
+    }]
+  }
 }
 
 
@@ -26,12 +39,13 @@ module "application" {
   project_name = local.resource_suffix
   vpc_id       = module.network.vpc_id
   container_settings = {
-    image = "",
-    port  = 80
+    image = var.container_settings.image,
+    port  = var.container_settings.port
   }
+
   desired_count   = 2
   public_subnets  = module.network.public_subnets
-  security_groups = []
+  security_groups = module.network.security_groups
   services = [{
     name     = "api"
     port     = 80
@@ -48,11 +62,11 @@ module "application" {
     path_pattern  = "api*"
 
     container_settings = {
-      image = ""
-      port  = 9090
+      image = var.services.container_settings.image
+      port  = var.services.container_settings.port
     }
 
     public_subnets  = module.network.public_subnets
-    security_groups = []
+    security_groups = module.network.security_groups
   }]
 }
