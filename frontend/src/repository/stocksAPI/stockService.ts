@@ -7,7 +7,7 @@ export async function getRecommendations(
   offset: number = 0,
   filterOptions?: IFilterOptions,
 ): Promise<IStockListResponse> {
-  let url = `${endpoints.get}?offset=${offset}`
+  let url = `${endpoints().getRecommendations}?offset=${offset}`
 
   if (limit) {
     url += `&limit=${limit}`
@@ -29,10 +29,28 @@ export async function getRecommendations(
     url += `&target-to-max=${filterOptions?.TargetToMax}`
   }
 
-  const res = await fetch(url)
-  const json = await res.json()
+  try {
 
-  return json.data as IStockListResponse
+    const res = await fetch(url)
+
+    if (res.status.toString().startsWith('2')) {
+      const json = await res.json()
+
+      return json.data as IStockListResponse
+    }
+
+    return {
+      Items: [],
+      Total: 0
+    }
+
+  } catch (e) {
+    console.error({ error: e })
+    return {
+      Items: [],
+      Total: 0
+    }
+  }
 }
 
 export async function getAll(
@@ -40,7 +58,7 @@ export async function getAll(
   offset: number = 0,
   filterOptions?: IFilterOptions,
 ): Promise<IStockListResponse> {
-  let url = `${endpoints.get}?offset=${offset}`
+  let url = `${endpoints().get}?offset=${offset}`
 
   if (limit) {
     url += `&limit=${limit}`
@@ -62,8 +80,28 @@ export async function getAll(
     url += `&target-to-max=${filterOptions?.TargetToMax}`
   }
 
-  const res = await fetch(url)
-  const json = await res.json()
 
-  return json.data as IStockListResponse
+  try {
+
+    const res = await fetch(url)
+    if (res.status.toString().startsWith('2')) {
+      const json = await res.json()
+
+      return json.data as IStockListResponse
+    }
+
+    return {
+      Items: [],
+      Total: 0
+    }
+  } catch (e) {
+
+    console.error({ error: e })
+
+    return {
+      Items: [],
+      Total: 0
+    }
+  }
+
 }

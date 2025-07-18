@@ -1,0 +1,28 @@
+FROM golang:1.24-alpine as Build
+
+WORKDIR /app
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o /stock-recommendation-api bin/main.go
+
+# --- DEPLOY ---
+
+FROM alpine AS Deploy
+
+WORKDIR /
+
+RUN addgroup -S api-user && adduser -S api-user -G api-user
+
+COPY --from=Build /stock-recommendation-api /stock-recommendation-api
+
+EXPOSE 8080
+
+USER api-user:api-user
+
+ENTRYPOINT ["/stock-recommendation-api"]
+
+

@@ -12,15 +12,22 @@
     </div>
 
     <template v-if="store.stocks.length > 0">
-      <StockList :stocks="store.stocks" :is-loading="store.isLoading" :items-per-page="store.itemsPerPage" />
-      <StockPagination :current-page="store.currentPage" :total-items="store.totalItems" :total-pages="store.totalPages"
-        :items-per-page="store.itemsPerPage" @update:items-per-page="store.setItemsPerPage"
-        @update:current-page="store.setCurrentPage" />
+      <StockList
+        :stocks="store.stocks"
+        :is-loading="store.isLoading"
+        :items-per-page="store.itemsPerPage"
+      />
+      <StockPagination
+        :current-page="store.currentPage"
+        :total-items="store.totalItems"
+        :total-pages="store.totalPages"
+        :items-per-page="store.itemsPerPage"
+        @update:items-per-page="store.setItemsPerPage"
+        @update:current-page="store.setCurrentPage"
+      />
     </template>
     <template v-else>
-      <div>
-        Data Not Found
-      </div>
+      <div>Data Not Found</div>
     </template>
   </DefaultLayout>
 </template>
