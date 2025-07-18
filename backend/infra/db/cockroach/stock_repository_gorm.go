@@ -101,7 +101,7 @@ func (r *gormStockRepository) FindRecommendations(limit int, offset int, filterO
 	var baseOptions []interface{}
 
 	baseQuery := `FROM
-  stock_models
+  stocks
   WHERE
   (
     (
