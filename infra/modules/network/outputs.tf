@@ -11,5 +11,5 @@ output "public_subnets" {
 }
 
 output "security_groups" {
-  value = [for sg in aws_security_group.sg : sg.id]
+  value = aws_security_group.sg
 }

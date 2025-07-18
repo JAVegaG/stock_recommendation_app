@@ -3,6 +3,10 @@ variable "project_name" {
   type        = string
 }
 
+variable "region" {
+  type = string
+}
+
 variable "name" {
   description = "Name of the specific service or path-based route (e.g., svc-a)"
   type        = string
@@ -70,5 +74,25 @@ variable "container_settings" {
   type = object({
     image = string
     port  = number
+    secrets = list(object({
+      name      = string
+      valueFrom = string
+    }))
+  })
+}
+
+variable "ecs_task_execution" {
+  description = "ECS Task Execution"
+  type = object({
+    iam_role = object({
+      arn = string
+    })
+  })
+}
+
+variable "cluster" {
+  description = "cluster data"
+  type = object({
+    id = string
   })
 }

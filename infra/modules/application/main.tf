@@ -2,6 +2,11 @@ resource "aws_ecs_cluster" "this" {
   name = var.project_name
 }
 
+
+resource "aws_cloudwatch_log_group" "log" {
+  name = "awslogs-${var.project_name}"
+}
+
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.project_name}-task"
   cpu                      = 256
@@ -19,7 +24,17 @@ resource "aws_ecs_task_definition" "app" {
           containerPort = var.container_settings.port
         }
       ],
-      essential = true
+      essential = true,
+      secrets   = var.container_settings.secrets,
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-create-group"  = "true",
+          "awslogs-group"         = "${aws_cloudwatch_log_group.log.name}",
+          "awslogs-region"        = "${var.region}",
+          "awslogs-stream-prefix" = "${var.project_name}-container"
+        }
+      },
     }
   ])
 }
@@ -42,48 +57,9 @@ resource "aws_ecs_service" "app" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.app.arn
+    target_group_arn = var.lb_settings.target_group.arn
     container_name   = "${var.project_name}-container"
     container_port   = var.container_settings.port
-  }
-
-  depends_on = [aws_lb_listener.http]
-}
-
-resource "aws_lb" "app" {
-  name               = "${var.project_name}-lb"
-  internal           = false
-  load_balancer_type = "application"
-  subnets            = var.public_subnets
-  security_groups    = var.security_groups
-}
-
-resource "aws_lb_target_group" "app" {
-  name        = "${var.project_name}-tg"
-  port        = var.container_settings.port
-  protocol    = "HTTP"
-  vpc_id      = var.vpc_id
-  target_type = "ip"
-
-  health_check {
-    path                = var.health_check.path
-    protocol            = var.health_check.protocol
-    matcher             = "200"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-}
-
-resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.app.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.app.arn
   }
 
 }
@@ -105,6 +81,33 @@ resource "aws_iam_role" "ecs_task_execution" {
   })
 }
 
+resource "aws_iam_role_policy" "ssm_access" {
+  name = "AllowSSMParameters"
+  role = aws_iam_role.ecs_task_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+        ],
+        Resource = "arn:aws:ssm:${var.region}:${var.account_id}:parameter/*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:log-group:awslogs-stock-app-eb978ab2-default:*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
   role       = aws_iam_role.ecs_task_execution.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
@@ -116,8 +119,13 @@ module "services" {
   source   = "./modules/services"
 
   project_name = var.project_name
+  region       = var.region
+  cluster      = aws_ecs_cluster.this
   vpc_id       = var.vpc_id
-  lb_listener  = aws_lb_listener.http
+  lb_listener  = var.lb_settings.listener
+  ecs_task_execution = {
+    iam_role = aws_iam_role.ecs_task_execution
+  }
 
   name          = each.value.name
   port          = each.value.port

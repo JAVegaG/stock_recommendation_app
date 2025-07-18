@@ -50,7 +50,7 @@ resource "aws_security_group" "sg" {
 resource "aws_vpc_security_group_ingress_rule" "sg_ingress_rule" {
   for_each          = { for idx, ingress_rule in var.security_group.ingress_rules : idx => ingress_rule }
   security_group_id = aws_security_group.sg.id
-  cidr_ipv4         = aws_vpc.main_vpc.cidr_block
+  cidr_ipv4         = each.value.cidr_block
   from_port         = each.value.from_port
   ip_protocol       = each.value.ip_protocol
   to_port           = each.value.to_port
@@ -59,7 +59,7 @@ resource "aws_vpc_security_group_ingress_rule" "sg_ingress_rule" {
 resource "aws_vpc_security_group_egress_rule" "sg_egress_rule" {
   for_each          = { for idx, egress_rule in var.security_group.egress_rules : idx => egress_rule }
   security_group_id = aws_security_group.sg.id
-  cidr_ipv4         = each.value.cidr_block
+  cidr_ipv4         = each.value.cidr_ipv4
   from_port         = each.value.from_port
   ip_protocol       = each.value.ip_protocol
   to_port           = each.value.to_port

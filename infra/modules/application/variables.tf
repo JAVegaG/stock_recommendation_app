@@ -3,11 +3,23 @@ variable "project_name" {
   type        = string
 }
 
+variable "region" {
+  type = string
+}
+
+variable "account_id" {
+  type = string
+}
+
 variable "container_settings" {
   description = "Container settings (image, port)"
   type = object({
     image = string
     port  = number
+    secrets = list(object({
+      name      = string
+      valueFrom = string
+    }))
   })
 }
 
@@ -58,9 +70,25 @@ variable "services" {
     container_settings = object({
       image = string
       port  = number
+      secrets = list(object({
+        name      = string
+        valueFrom = string
+      }))
     })
     desired_count   = number
     public_subnets  = set(string)
     security_groups = set(string)
   }))
+}
+
+variable "lb_settings" {
+  description = "Load Balancer Settings"
+  type = object({
+    target_group = object({
+      arn = string
+    })
+    listener = object({
+      arn = string
+    })
+  })
 }

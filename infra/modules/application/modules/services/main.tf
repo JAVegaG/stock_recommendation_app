@@ -4,24 +4,34 @@ resource "aws_ecs_task_definition" "app" {
   memory                   = 512
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  execution_role_arn       = var.ecs_task_execution.iam_role.arn
 
   container_definitions = jsonencode([
     {
-      name  = "${var.project_name}-container",
+      name  = "${var.project_name}-container-${var.name}",
       image = var.container_settings.image,
       portMappings = [
         {
           containerPort = var.container_settings.port
         }
       ],
-      essential = true
+      essential = true,
+      secrets   = var.container_settings.secrets,
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-create-group"  = "true",
+          "awslogs-group"         = "awslogs-${var.project_name}",
+          "awslogs-region"        = "${var.region}",
+          "awslogs-stream-prefix" = "${var.project_name}-container-${var.name}"
+        }
+      },
     }
   ])
 }
 
 resource "aws_ecs_service" "app" {
-  name            = "${var.project_name}-service"
+  name            = "${var.project_name}-service-${var.name}"
   cluster         = var.cluster.id
   task_definition = aws_ecs_task_definition.app.arn
   desired_count   = var.desired_count
@@ -55,6 +65,7 @@ resource "aws_lb_target_group" "svc" {
   health_check {
     path                = var.health_check.path
     protocol            = var.health_check.protocol
+    port                = var.container_settings.port
     matcher             = "200"
     interval            = 30
     timeout             = 5

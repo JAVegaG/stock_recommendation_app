@@ -31,12 +31,15 @@ variable "security_group" {
       from_port   = number
       to_port     = number
       ip_protocol = string
+      cidr_block  = string
     }))
     egress_rules = list(object({
       cidr_ipv4   = string
-      from_port   = number
-      to_port     = number
-      ip_protocol = string
+      from_port   = optional(number)
+      to_port     = optional(number)
+      ip_protocol = optional(string)
     }))
+
   })
+
 }

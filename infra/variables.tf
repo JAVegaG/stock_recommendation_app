@@ -35,12 +35,12 @@ variable "container_settings" {
   })
 }
 
-variable "services" {
-  description = "List of services to be deployed"
-  type = list(object({
+variable "service" {
+  description = "Backend service to be deployed"
+  type = object({
     container_settings = object({
       image = string
       port  = number
     })
-  }))
+  })
 }
